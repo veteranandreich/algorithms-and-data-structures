@@ -66,16 +66,5 @@ public:
 	{
 		return size;
 	}
-
 };
-
-int main()
-{
-	DoublyLinkesList<int> list;
-	list.Push(5);
-	list.Push(6);
-	list.Print();
-	std::cout << list.Size();
-	
-}
 

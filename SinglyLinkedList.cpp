@@ -8,42 +8,39 @@ struct Element
 };
 
 template <typename type>
-class SinglyLinkedList
-{
+class SinglyLinkedList final
+{	
 private:
-	Element <type>* top = new Element <type>;
-	Element <type>* bottom = new Element <type>;
-	size_t list_size = 0;
-	void Push_first(const type& element)
+	Element <type>* top;
+	Element <type>* bottom;
+	size_t list_size;
+
+public:
+	SinglyLinkedList()
+	{
+		top = new Element <type>;
+		bottom = new Element <type>;
+		list_size = 0;
+		top->next = bottom;
+		bottom->next = top;
+	}
+	void Push(const type& element)
 	{
 		Element <type>* new_element = new Element <type>;
 		new_element->value = element;
-		bottom->next = new_element;
+		new_element->next = top->next;
 		top->next = new_element;
+		if (list_size == 0)
+		{
+			bottom->next = new_element;
+		}
 		list_size++;
-	}
-
-public:
-	void Push(const type& element)
-	{
-		if (top->next == nullptr)
-		{
-			Push_first(element);
-		}
-		else
-		{
-			Element <type>* new_element = new Element <type>;
-			new_element->value = element;
-			new_element->next = top->next;
-			top->next = new_element;
-			list_size++;
-		}
 	}
 
 	void Print()
 	{
 		Element <type>* element = top->next;
-		while (element != nullptr)
+		while (element != bottom)
 		{
 			std::cout << element->value << std::endl;
 			element = element->next;
@@ -52,6 +49,10 @@ public:
 
 	Element<type>* Find(const type& target)
 	{
+		if (list_size == 0)
+		{
+			return nullptr;
+		}
 		Element <type>* element = top->next;
 		while (element != nullptr)
 		{
@@ -64,26 +65,19 @@ public:
 
 	void Push_back(const type& element)
 	{
-		if (top->next == nullptr)
-		{
-			Push_first(element);
-		}
-		else
-		{
-			Element <type>* new_element = new Element <type>;
-			new_element->value = element;
-			bottom->next->next = new_element;
-			bottom->next = new_element;
-			list_size++;
-		}
+		Element <type>* new_element = new Element <type>;
+		new_element->value = element;
+		bottom->next->next = new_element;
+		bottom->next = new_element;
+		new_element->next = bottom;
+		list_size++;
 	}
 
 	void Insert(Element<type>* previous_element, const type& element)
 	{
 		Element <type>* new_element = new Element <type>;
 		new_element->value = element;
-		if (previous_element->next == nullptr) bottom->next = new_element;
-		else new_element->next = previous_element->next;
+		new_element->next = previous_element->next;
 		previous_element->next = new_element;
 		list_size++;
 	}
@@ -101,10 +95,17 @@ public:
 
 	Element<type>* Pop()
 	{
-		Element<type>* _ = top->next;
-		top->next = top->next->next;
-		list_size--;
-		return _;
+		if (list_size == 0)
+		{
+			return nullptr;
+		}
+		else
+		{
+			Element<type>* _ = top->next;
+			top->next = top->next->next;
+			list_size--;
+			return _;
+		}
 	}
 
 	size_t Size()
@@ -114,29 +115,48 @@ public:
 
 	Element<type>* Begin()
 	{
+		if (list_size == 0)
+		{
+			return nullptr;
+		}
 		return top->next;
 	}
 
 	Element<type>* End()
 	{
+		if (list_size == 0)
+		{
+			return nullptr;
+		}
 		return bottom->next;
 	}
-
-};
-
-int main()
-{
-	//Example Program:
-	/* 
-	SinglyLinkedList <int> list;
-	list.Push(5);
-	list.Push_back(8);
-	Element <int>* b = list.Find(5);
-	list.Insert(b, 6);
-	list.Insert(b, 7);
-	for (Element <int>* b = list.Begin(); b != nullptr; b = b->next)
+	
+	SinglyLinkedList<type>* Copy()
 	{
-		std::cout << b->value<< std::endl;
+		SinglyLinkedList<type>* new_list = new SinglyLinkedList();
+		Element <type>* element = top->next;
+		while ((element != nullptr) && (element != bottom))
+		{
+			new_list->Push_back(element->value);
+			element = element->next;
+		}
+		return new_list;
 	}
-	*/
-}
+	
+	void Sort()
+	{
+
+	}
+
+	~SinglyLinkedList()
+	{
+		auto a = this->Pop();
+		while (list_size != 0)
+		{
+			delete a;
+			a = this->Pop();
+		}
+		delete top;
+		delete bottom;
+	}
+};
